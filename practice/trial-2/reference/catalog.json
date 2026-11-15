@@ -1,0 +1,123 @@
+{
+  "schema": "free-model-aggregator-01/catalog/v1",
+  "providers": [
+    {
+      "id": "groq",
+      "base_url": "/p/groq",
+      "key_env": "GROQ_API_KEY",
+      "wire": "openai",
+      "free_models": [
+        "llama-3.1-8b-instant",
+        "gpt-oss-120b",
+        "qwen3.8-27b",
+        "gpt-oss-20b"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "cerebras",
+      "base_url": "/p/cerebras",
+      "key_env": "CEREBRAS_API_KEY",
+      "wire": "openai",
+      "free_models": [
+        "llama-4-scout-17b",
+        "qwen-3.8-27b",
+        "gpt-oss-120b"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "gemini",
+      "base_url": "/p/gemini",
+      "key_env": "GEMINI_API_KEY",
+      "wire": "gemini",
+      "free_models": [
+        "gemini-3.8-flash",
+        "gemma-4-31b",
+        "gemma-4-26b"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "zai",
+      "base_url": "/p/zai",
+      "key_env": "ZAI_API_KEY",
+      "wire": "anthropic",
+      "free_models": [
+        "glm-4.7-flash",
+        "glm-4.6v-flash"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "openrouter",
+      "base_url": "/p/openrouter",
+      "key_env": "OPENROUTER_API_KEY",
+      "wire": "openai",
+      "free_models": [
+        "z-ai/glm-5.3-flash:free",
+        "deepseek/deepseek-v4.1:free",
+        "minimax/m3:free"
+      ],
+      "paid_models": [
+        "anthropic/claude-opus-5.5"
+      ]
+    },
+    {
+      "id": "sambanova",
+      "base_url": "/p/sambanova",
+      "key_env": "SAMBANOVA_API_KEY",
+      "wire": "openai",
+      "free_models": [
+        "deepseek-v3.2",
+        "gemma-4-31b"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "pollinations",
+      "base_url": "/p/pollinations",
+      "key_env": "",
+      "wire": "openai",
+      "free_models": [
+        "mistral-nemo",
+        "openai-fast"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "cloudflare",
+      "base_url": "/p/cloudflare",
+      "key_env": "CLOUDFLARE_API_TOKEN",
+      "wire": "openai",
+      "free_models": [
+        "glm-4.7-flash",
+        "llama-3.3-70b",
+        "nemotron-3.5-super-vl"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "ovh",
+      "base_url": "/p/ovh",
+      "key_env": "",
+      "wire": "openai",
+      "free_models": [
+        "qwen3.5-397b",
+        "llama-3.3-70b"
+      ],
+      "paid_models": []
+    },
+    {
+      "id": "kilol",
+      "base_url": "/p/kilol",
+      "key_env": "",
+      "wire": "openai",
+      "free_models": [
+        "kilo-fast",
+        "kilo-auto/free"
+      ],
+      "paid_models": []
+    }
+  ]
+}

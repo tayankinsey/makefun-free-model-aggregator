@@ -1,0 +1,357 @@
+{
+  "schema": "free-model-aggregator-01/ratings/v1",
+  "ratings": [
+    {
+      "model": "llama-3.1-8b-instant",
+      "provider": "groq",
+      "rating_milli": 1210,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "gpt-oss-120b",
+      "provider": "groq",
+      "rating_milli": 1352,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "qwen3.8-27b",
+      "provider": "groq",
+      "rating_milli": 1434,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "gpt-oss-20b",
+      "provider": "groq",
+      "rating_milli": 1318,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "llama-4-scout-17b",
+      "provider": "cerebras",
+      "rating_milli": 1250,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "qwen-3.8-27b",
+      "provider": "cerebras",
+      "rating_milli": 1434,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "gpt-oss-120b",
+      "provider": "cerebras",
+      "rating_milli": 1352,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "provider": "gemini",
+      "rating_milli": 1458,
+      "context_length": 1048576,
+      "tools": true,
+      "vision": true,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "gemma-4-31b",
+      "provider": "gemini",
+      "rating_milli": 1452,
+      "context_length": 131072,
+      "tools": true,
+      "vision": true,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "gemma-4-26b",
+      "provider": "gemini",
+      "rating_milli": 1410,
+      "context_length": 32768,
+      "tools": false,
+      "vision": true,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "glm-4.7-flash",
+      "provider": "zai",
+      "rating_milli": 1470,
+      "context_length": 204800,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "glm-4.6v-flash",
+      "provider": "zai",
+      "rating_milli": 1432,
+      "context_length": 204800,
+      "tools": true,
+      "vision": true,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "z-ai/glm-5.3-flash:free",
+      "provider": "openrouter",
+      "rating_milli": 1475,
+      "context_length": 204800,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "deepseek/deepseek-v4.1:free",
+      "provider": "openrouter",
+      "rating_milli": 1462,
+      "context_length": 163840,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "minimax/m3:free",
+      "provider": "openrouter",
+      "rating_milli": 1436,
+      "context_length": 196608,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "anthropic/claude-opus-5.5",
+      "provider": "openrouter",
+      "rating_milli": 1520,
+      "context_length": 200000,
+      "tools": true,
+      "vision": true,
+      "json": false,
+      "free": false
+    },
+    {
+      "model": "deepseek-v3.2",
+      "provider": "sambanova",
+      "rating_milli": 1465,
+      "context_length": 163840,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "gemma-4-31b",
+      "provider": "sambanova",
+      "rating_milli": 1452,
+      "context_length": 131072,
+      "tools": false,
+      "vision": true,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "mistral-nemo",
+      "provider": "pollinations",
+      "rating_milli": 1180,
+      "context_length": 32768,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "openai-fast",
+      "provider": "pollinations",
+      "rating_milli": 1390,
+      "context_length": 32768,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "glm-4.7-flash",
+      "provider": "cloudflare",
+      "rating_milli": 1470,
+      "context_length": 204800,
+      "tools": true,
+      "vision": false,
+      "json": true,
+      "free": true
+    },
+    {
+      "model": "llama-3.3-70b",
+      "provider": "cloudflare",
+      "rating_milli": 1330,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "nemotron-3.5-super-vl",
+      "provider": "cloudflare",
+      "rating_milli": 1414,
+      "context_length": 131072,
+      "tools": false,
+      "vision": true,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "qwen3.5-397b",
+      "provider": "ovh",
+      "rating_milli": 1440,
+      "context_length": 262144,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "llama-3.3-70b",
+      "provider": "ovh",
+      "rating_milli": 1330,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "kilo-fast",
+      "provider": "kilol",
+      "rating_milli": 1140,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    },
+    {
+      "model": "kilo-auto/free",
+      "provider": "kilol",
+      "rating_milli": 1420,
+      "context_length": 131072,
+      "tools": true,
+      "vision": false,
+      "json": false,
+      "free": true
+    }
+  ],
+  "best": [
+    {
+      "id": "r01",
+      "rating_milli": 1458
+    },
+    {
+      "id": "r02",
+      "rating_milli": 1458
+    },
+    {
+      "id": "r03",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r04",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r05",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r06",
+      "rating_milli": 1458
+    },
+    {
+      "id": "r07",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r08",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r09",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r10",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r11",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r12",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r13",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r14",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r15",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r16",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r17",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r18",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r19",
+      "rating_milli": 1475
+    },
+    {
+      "id": "r20",
+      "rating_milli": 1475
+    }
+  ]
+}

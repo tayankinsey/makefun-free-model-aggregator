@@ -1,0 +1,424 @@
+{
+  "schema": "free-model-aggregator-01/providers/v1",
+  "providers": [
+    {
+      "id": "groq",
+      "name": "Groq",
+      "wire": "openai",
+      "auth": "bearer",
+      "path": "/p/groq",
+      "key_env": "GROQ_API_KEY",
+      "key": "sim-groq-0001",
+      "budget": 10,
+      "concurrency": 0,
+      "fail_calls": [
+        6,
+        7
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "llama-3.1-8b-instant",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1210
+        },
+        {
+          "id": "gpt-oss-120b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1352
+        },
+        {
+          "id": "qwen3.8-27b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1434
+        },
+        {
+          "id": "gpt-oss-20b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1318
+        }
+      ]
+    },
+    {
+      "id": "cerebras",
+      "name": "Cerebras",
+      "wire": "openai",
+      "auth": "bearer",
+      "path": "/p/cerebras",
+      "key_env": "CEREBRAS_API_KEY",
+      "key": "sim-cerebras-0002",
+      "budget": 5,
+      "concurrency": 0,
+      "fail_calls": [
+        3
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "llama-4-scout-17b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1250
+        },
+        {
+          "id": "qwen-3.8-27b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1434
+        },
+        {
+          "id": "gpt-oss-120b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1352
+        }
+      ]
+    },
+    {
+      "id": "gemini",
+      "name": "Google Gemini",
+      "wire": "gemini",
+      "auth": "x-goog-api-key",
+      "path": "/p/gemini",
+      "key_env": "GEMINI_API_KEY",
+      "key": "sim-gemini-0003",
+      "budget": 7,
+      "concurrency": 0,
+      "fail_calls": [
+        4,
+        5
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "gemini-3.8-flash",
+          "free": true,
+          "context_length": 1048576,
+          "tools": true,
+          "vision": true,
+          "json": true,
+          "rating_milli": 1458
+        },
+        {
+          "id": "gemma-4-31b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": true,
+          "json": false,
+          "rating_milli": 1452
+        },
+        {
+          "id": "gemma-4-26b",
+          "free": true,
+          "context_length": 32768,
+          "tools": false,
+          "vision": true,
+          "json": false,
+          "rating_milli": 1410
+        }
+      ]
+    },
+    {
+      "id": "zai",
+      "name": "Z.ai",
+      "wire": "anthropic",
+      "auth": "bearer",
+      "path": "/p/zai",
+      "key_env": "ZAI_API_KEY",
+      "key": "sim-zai-0004",
+      "budget": 4,
+      "concurrency": 1,
+      "fail_calls": [
+        2
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "glm-4.7-flash",
+          "free": true,
+          "context_length": 204800,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1470
+        },
+        {
+          "id": "glm-4.6v-flash",
+          "free": true,
+          "context_length": 204800,
+          "tools": true,
+          "vision": true,
+          "json": false,
+          "rating_milli": 1432
+        }
+      ]
+    },
+    {
+      "id": "openrouter",
+      "name": "OpenRouter",
+      "wire": "openai",
+      "auth": "bearer",
+      "path": "/p/openrouter",
+      "key_env": "OPENROUTER_API_KEY",
+      "key": "sim-openrouter-0005",
+      "budget": 12,
+      "concurrency": 0,
+      "fail_calls": [
+        2,
+        10
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "z-ai/glm-5.3-flash:free",
+          "free": true,
+          "context_length": 204800,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1475
+        },
+        {
+          "id": "deepseek/deepseek-v4.1:free",
+          "free": true,
+          "context_length": 163840,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1462
+        },
+        {
+          "id": "minimax/m3:free",
+          "free": true,
+          "context_length": 196608,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1436
+        },
+        {
+          "id": "anthropic/claude-opus-5.5",
+          "free": false,
+          "context_length": 200000,
+          "tools": true,
+          "vision": true,
+          "json": false,
+          "rating_milli": 1520
+        }
+      ]
+    },
+    {
+      "id": "sambanova",
+      "name": "SambaNova",
+      "wire": "openai",
+      "auth": "bearer",
+      "path": "/p/sambanova",
+      "key_env": "SAMBANOVA_API_KEY",
+      "key": "sim-sambanova-0006",
+      "budget": 4,
+      "concurrency": 0,
+      "fail_calls": [
+        3
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "deepseek-v3.2",
+          "free": true,
+          "context_length": 163840,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1465
+        },
+        {
+          "id": "gemma-4-31b",
+          "free": true,
+          "context_length": 131072,
+          "tools": false,
+          "vision": true,
+          "json": false,
+          "rating_milli": 1452
+        }
+      ]
+    },
+    {
+      "id": "pollinations",
+      "name": "Pollinations",
+      "wire": "openai",
+      "auth": "none",
+      "path": "/p/pollinations",
+      "key_env": "",
+      "key": "",
+      "budget": 13,
+      "concurrency": 0,
+      "fail_calls": [
+        5
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "mistral-nemo",
+          "free": true,
+          "context_length": 32768,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1180
+        },
+        {
+          "id": "openai-fast",
+          "free": true,
+          "context_length": 32768,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1390
+        }
+      ]
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare Workers AI",
+      "wire": "openai",
+      "auth": "bearer",
+      "path": "/p/cloudflare",
+      "key_env": "CLOUDFLARE_API_TOKEN",
+      "key": "sim-cloudflare-0007",
+      "budget": 8,
+      "concurrency": 0,
+      "fail_calls": [
+        2,
+        5
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "glm-4.7-flash",
+          "free": true,
+          "context_length": 204800,
+          "tools": true,
+          "vision": false,
+          "json": true,
+          "rating_milli": 1470
+        },
+        {
+          "id": "llama-3.3-70b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1330
+        },
+        {
+          "id": "nemotron-3.5-super-vl",
+          "free": true,
+          "context_length": 131072,
+          "tools": false,
+          "vision": true,
+          "json": false,
+          "rating_milli": 1414
+        }
+      ]
+    },
+    {
+      "id": "ovh",
+      "name": "OVHcloud AI Endpoints",
+      "wire": "openai",
+      "auth": "none",
+      "path": "/p/ovh",
+      "key_env": "",
+      "key": "",
+      "budget": 6,
+      "concurrency": 0,
+      "fail_calls": [
+        3,
+        4
+      ],
+      "outage_from": null,
+      "models": [
+        {
+          "id": "qwen3.5-397b",
+          "free": true,
+          "context_length": 262144,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1440
+        },
+        {
+          "id": "llama-3.3-70b",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1330
+        }
+      ]
+    },
+    {
+      "id": "kilol",
+      "name": "Kilo",
+      "wire": "openai",
+      "auth": "none",
+      "path": "/p/kilol",
+      "key_env": "",
+      "key": "",
+      "budget": 15,
+      "concurrency": 0,
+      "fail_calls": [
+        8,
+        11
+      ],
+      "outage_from": 7,
+      "models": [
+        {
+          "id": "kilo-fast",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1140
+        },
+        {
+          "id": "kilo-auto/free",
+          "free": true,
+          "context_length": 131072,
+          "tools": true,
+          "vision": false,
+          "json": false,
+          "rating_milli": 1420
+        }
+      ]
+    }
+  ]
+}

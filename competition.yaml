@@ -1,0 +1,375 @@
+# free-model-aggregator-01: an agent/v1 competition. The entry is one server (Node 22 main.ts or Python
+# 3.13 main.py) that serves the OpenAI Chat Completions API and the Anthropic Messages API over ten
+# simulated free-tier model providers, in JSON and in server-sent events, and registers the catalog it
+# read from them. Each trial sends it 20 requests; it must answer each with the best free model that can
+# serve it, fail over when a provider refuses, and exit 0 when the env says the workload is done.
+# Validated by server/competitions/load.ts against contracts/competition.ts; seeded by `npm run db:seed`.
+#
+# The owner's ask (2026-11-13): "Best free AI model aggregator (the code should host an openai/anthropic api
+# supported endpoint that dials to the most high quality free models, and have an arg that just lists all the
+# available models, endpoints, keys, etc.)"
+#
+# The three sealed programs, each built from src/ by scripts/competitions/build-agent-bundle.ts (no hand
+# edits; `--check` proves a committed bundle is a fresh build):
+#   generator/draw.mjs  node22: draws one instance from /input/seed.json into /output/input (prompt.txt,
+#                       the brief and the only file the entry sees: the ten providers, the quality table
+#                       and the workload manifest; env/providers.json and env/workload.json for the env)
+#                       and /output/reference (catalog.json, every provider's free and paid models, and
+#                       ratings.json, the quality table and each request's best). A practice and a scored
+#                       draw differ only in their seed and trial index.
+#   env/server.mjs      node22: serves the ten simulated providers under PROVIDER_PREFIX, each on its own
+#                       wire (OpenAI, Anthropic or Gemini), auth scheme, per-trial budget and failure
+#                       schedule, with one provider that serves one call at a time; serves the control
+#                       routes /register, /work and /instance; drives the 20-request client at the
+#                       entry's server; exports state.json on SIGTERM (src/shared/protocol.ts).
+#   scorer/score.mjs    node22: scores the export against the reference: the five components of
+#                       SCORE_WEIGHT_PERCENT, the working flag, the provider-call tie-break, and
+#                       the leaderboard's columns (COLUMNS, in board order; protocol.ts is the source).
+# The digests at harness.generator_sha256, env_sha256 and scorer_sha256 are the three sealed trees'
+# tree digests (load.ts treeSha256), filled by the seal step that builds them from src/ with
+# scripts/competitions/build-agent-bundle.ts (the draft's PENDING-SEAL placeholders are gone: the loader
+# reads them). src/shared/protocol.ts is the contract between the three parts, and the rules quote it.
+#
+# Why this contest, and why its winner beats the public alternatives (surveyed 2026-11-13; raw pages in
+# .tmp/research-3): no public free-model router ranks free models by quality. LiteLLM (63,220 stars),
+# new-api (51,887), claude-code-router (38,143) and uni-api all make you name a model or a group;
+# LLM-API-Key-Proxy rotates keys within a provider; and OpenRouter's openrouter/free picks a free model
+# at random with 50 requests a day. The winning entry is a quality-ordered free catalog, rate-limit-aware
+# failover and both API wires in one zero-config server, with a --list of the catalog it found: a tool an
+# agent builder can point a client at and keep running while each provider's free tier runs dry.
+#
+# The trial, in protocol.ts's terms: the entry registers {protocol_version: 1, port, catalog} at
+# POST $MAKEFUN_ENV_URL/register and is told how many requests are coming; the client sends them one at
+# a time, in JSON and in server-sent events; GET $MAKEFUN_ENV_URL/work says {done: false, next, pending}
+# until the last and then {done: true}, when the entry must exit 0. The env gives the entry a directory
+# of ten providers (id, name, wire, auth scheme, base URL, key env var and key) in the brief, the sealed
+# quality table (model, provider, rating, context length, tools, vision, json, free) and the workload's
+# manifest (id, api, stream, weight, requirements); the provider calls are budgeted per trial, one
+# provider takes one call at a time, and failures follow the instance's schedule (402 on one provider,
+# 429 on the rest; src/shared/providers.ts failure_status).
+#
+# The grading load is agent/v1's own: a submission, a transcript ingest, a dev or final grade landing and an
+# audit run its existing handlers, and this bundle adds no platform code between them. The env is sealed
+# bundle code running inside the sandbox, so its 20 client requests to the entry are loopback sockets and
+# cause no database reads. The field-scanning paths it uses are agent/v1's own too: entriesToGradeLean on the
+# transcript gate (finalGradeOwed) and on the code-heat field (codeHeatField), unchanged by the bundle. The
+# preflight prices the final at 2,000 entries at 64 sandbox pods at once, 2,180 made over the final and 131
+# pod-seconds a graded entry, beside 48 pods of the other live contests on s9 (s18 runs 40 timed pods inside
+# its 146 pod places, 82 pods of its own); the grading budget at 2,000 entries is 1.13 h expected and 2.33 h
+# worst, and a practice grade 0.09 of its lane a day. No e2e-rig run was owed: the bundle adds no new platform path and no
+# field larger than those already graded (the agent contests ran 597, 618 and 3,340 entries).
+#
+# Scoring, from protocol.ts SCORE_WEIGHT_PERCENT: quality 60, served 15, wire 10, failover 10, catalog 5,
+# each a component from 0 to 100 and the score their weighted sum, rounded to an integer. The
+# leaderboard's columns are COLUMNS: score, the five components, upstream_calls (the tie-break, fewer
+# first, then the earlier receipt) and working (1 when at least one request was answered validly, else 0;
+# a trial whose server does not work still scores what its other columns earn). A paid model is never a
+# legal pick, and the quality column's bound is each request's best rating at its requirements
+# (ratings.json best), ignoring every free-tier budget.
+#
+# The money and the window: $500 over the release's twenty-place table ($100 / $70 / $50 / $20 for 4th to
+# 10th / $14 for 11th to 20th), sponsor make-fun, 2 days of entries from 2026-11-14T02:30Z to
+# 2026-11-16T02:30Z, and the final from 2026-11-16T02:40Z (10 minutes after the deadline, the commit
+# window an escrow open takes) to 2026-11-16T10:40Z. The bundle lands open and public in the seal
+# commit, which freezes the bytes.
+#
+# The final: 3 scored instances, drawn by the sealed generator from the first drand round emitted at or
+# after the final phase starts; 3 practice instances from a round emitted before the opening. It is
+# staged at 60 contenders (3 x the 20 paid places) with no practice floor (practice_floor: 0): every
+# entry runs the first scored instance once, live and unreplayed, and the 60 best there, every tie with
+# the 60th included, run all 3, each trial replayed and byte for byte the same. Contenders rank on their
+# mean score over the 3; every other entry ranks below them by its score on the first.
+#
+# The automation: lifecycle true, payouts auto and escrow at_open, so the reward is locked in make.fun's
+# escrow program when it opens and the final starts one commit window after the deadline; the rules and
+# the criteria say both payout outcomes in the btc-race template's words, and name no challenge window.
+#
+# Landed beside it: the sealed generator/, env/ and scorer/ trees and their three digests, instance.yaml
+# drawn by scripts/competitions/instance.ts, tests/unit/comp-free-model-aggregator-01.test.ts, and the
+# seal commit's shared lists (the catalogue row, the escrow-at-open list, the tie-break row, the meme
+# and the production seed block).
+version: 1
+
+competition:
+  slug: free-model-aggregator-01
+  title: The best free AI model aggregator
+  summary: "Write one server that serves an OpenAI- and an Anthropic-compatible API over ten simulated free-tier model providers, routing each of 20 requests to the best free model, failing over when a provider refuses, and reporting the catalog it read. Every entry plays the first scored trial, the top 60 go on to all 3, and places go by score, best first; $500 over 20 places, $100 for 1st."
+  demand: "Developers and agent builders who want one endpoint that picks the best free model for every request, falls back across providers' free tiers when one refuses, and lists the whole free catalog it found."
+  category: Code
+  skills: [TypeScript, Python, HTTP APIs, Streaming, Model routing]
+  status: open
+  visibility: public
+  sponsor: make-fun
+  reward_usd: 500
+  opens_at: "2026-11-14T02:30:00Z"
+  deadline: "2026-11-16T02:30:00Z"
+  description: |-
+    In short: one server, two APIs, ten simulated free-tier providers, and 20 requests that each need the best free model able to serve them.
+
+    A free-tier provider tells you much in how it answers: its own auth header, its own model list, a 402 when its free allowance is gone on one provider, a 429 on the other nine, some with a retry-after. We give you ten providers that speak the real OpenAI, Anthropic and Gemini wires, each with its own per-trial budget and its own schedule of failures, and a client that sends 20 requests through your server, in JSON and in streaming, some asking for tools, images, JSON mode or a long context. Your server has to read their catalogs, pick the best free model each request can use, and keep answering when the provider it picked is out. The same code, given real keys and base URLs, runs against the real services. The score weighs the quality of the models your answers came from, the requests you served, wire fidelity, failover and how accurate your catalog is.
+
+    ## Deliverables
+    - A public GitHub repository owned by your own GitHub account, created after the competition opens, under an OSI-approved license, with your server at main.ts (Node 22) or main.py (Python 3.13) in the repository root
+    - The AI coding-agent transcripts of the sessions that built it (Claude Code, Codex, Cursor and others), uploaded with each submission
+
+    ## Requirements
+    - Node 22 or Python 3.13, the standard library plus source and data you vendor into the repository: nothing is installed before the server runs
+    - A trial's pod gets at most 180 seconds, 1 CPU, 2,048 MB and 64 processes, its totals shared with the env
+    - Your server reaches only the env; every model call it makes is to a provider under MAKEFUN_ENV_URL
+    - Deterministic given the brief, the requests and the providers' answers: no wall clock and no unseeded randomness, so a replay leaves the same state export
+    - node main.ts --list or python3 main.py --list prints the catalog document your server registers, byte for byte
+    - At most 10 submissions a day and 20 in all; your last submission before the deadline is your final entry
+  rules: |-
+    ## What to build
+    Write one server in Node 22 (`main.ts`) or Python 3.13 (`main.py`). It serves two APIs over the providers the trial gives it: the OpenAI Chat Completions API and the Anthropic Messages API, each in JSON and in server-sent events. It has to:
+    - answer `POST /v1/chat/completions` as an OpenAI-compatible server does, and `POST /v1/messages` as an Anthropic-compatible one does, in JSON and in streaming
+    - answer `GET /v1/models` in the wire its auth header names: an `Authorization: Bearer` request gets the OpenAI model list, an `x-api-key` request the Anthropic one
+    - register its port and catalog with the env at the trial's start (see The trial), serve the requests the env's client sends, and exit 0 when the env says the workload is done
+    - print the catalog document with `node main.ts --list` (or `python3 main.py --list`), byte for byte as it registers it
+
+    Every response must be a well-formed answer of its API: the routes and bodies the request's wire expects, the streaming event order, the stop reasons, usage, tool calls and their results, the system prompt, `max_tokens` and images, each as the request asks. A response that is not does not count as served.
+
+    ## The trial
+    The sandbox sets `MAKEFUN_ENV_URL`, `MAKEFUN_PROMPT_FILE` and `MAKEFUN_TRIAL_SEED`. `MAKEFUN_PROMPT_FILE` is the brief: the ten providers with their ids, names, wires, auth schemes, base URLs, key environment variables and keys; the sealed quality table, each model's rating, context length and whether it takes tools, images and JSON; the workload's manifest, each request's id, API, streaming, weight and requirements; and these rules in short.
+
+    Your server listens on a port it picks and registers it: `POST $MAKEFUN_ENV_URL/register` with `{"protocol_version": 1, "port": <port>, "catalog": <the catalog document>}`. The env answers `{"ok": true, "requests": 20}`; an entry that speaks another protocol version is told so. The client then sends the 20 requests to your server, one at a time, and each must be answered with a free model that meets the request's requirements.
+
+    While the client works, `GET $MAKEFUN_ENV_URL/work` answers `{"done": false, "next": "<request id>", "pending": <n>}` and, once every request has been sent, `{"done": true}`. When it says done your server must exit 0. A process still running when the trial's wall is spent is stopped and scores 0 on every column.
+
+    The trial ends when your server exits or after the trial pod's 180 seconds; the pod's 1 CPU, 2,048 MB of memory and 64 processes are its totals, shared with the env. The env then writes its state export, and the scorer scores it. Every contender's final trial runs twice, live and then replayed: the replay sends the same requests and sees the same provider answers, and must leave the same state export, byte for byte; the first scored trial, which decides whether an entry goes on, runs once, live. So derive every choice from the brief, the requests and the providers' answers: no wall clock and no unseeded randomness.
+
+    A void is a fault that is never your entry's: the whole trial is void when the platform's machinery fails, and it runs again from the start on the same instance a minute later, at most twice; after a third void it waits for the organisers to run it again.
+
+    ## The providers
+    The ten providers are the free tiers of ten services. Each has an id, a name, a wire, an auth scheme, a base URL and a key, all in the brief, and each speaks its wire as the real service does:
+    - an OpenAI-wire provider answers `POST <base_url>/v1/chat/completions` and `GET <base_url>/v1/models`
+    - an Anthropic-wire provider answers `POST <base_url>/v1/messages` and `GET <base_url>/v1/models`
+    - a Gemini-wire provider answers `POST <base_url>/v1beta/models/<model>:generateContent`, or `:streamGenerateContent` for a streamed answer (an `?alt=sse` query is accepted), and `GET <base_url>/v1beta/models`
+    The auth scheme is each provider's own, as the brief lists it: `Authorization: Bearer <key>`, `x-api-key: <key>` or `x-goog-api-key: <key>` (or `?key=` on the Gemini wire), and a provider whose scheme is `none` takes no key: the wire does not decide the header. A call with the wrong header or key is refused in the wire's own error shape.
+
+    Each provider has its own budget of calls for the trial. A call that reaches it and names one of its free models counts, and a refusal on its schedule counts too; a wrong key (401), an unknown or paid model (400) and a second concurrent call spend none of it. Once the budget is spent the provider refuses with its own error status and serves no more of that trial: 402 for one of the ten providers, 429 for the other nine. A call on the provider's failure schedule refuses the same way, and so does every call from the instance's outage to the end of the trial, even while calls remain. One provider serves one call at a time: a second call sent while its first is in flight is refused with 429 and the `concurrent_requests` code, in the provider's own error shape.
+
+    Every provider's catalog route lists free and paid models. Only a free model may serve a request: a paid model is never a legal pick, whatever its rating, and an answer from one earns nothing. The providers' own catalogs are the truth your catalog is scored against.
+
+    The providers speak the real wires, so the same code, given the real services' keys and base URLs, runs against the real services.
+
+    ## Scoring
+    A trial scores 0 to 100: the weighted sum of five components, each from 0 to 100 and shown as its own column, rounded to an integer, with the `working` flag and the provider-call count beside them. `working` is 1 when at least one request was answered validly, else 0; a trial whose server does not work still scores what its other columns earn, and a trial stopped at its wall budget scores 0 on every column.
+    - quality (60%): for each request, the sealed quality table's rating of the free model that answered it, over the best rating in the table for a free model meeting that request's requirements (the quality column's bound, which ignores the providers' per-trial budgets), weighted by the request's weight, 1 or 2 for the heavier requests. An answer from a paid model earns nothing.
+    - served (15%): the share of the trial's requests answered validly, every check on them passing.
+    - wire (10%): the share of the checks on those responses that passed: the API's shape and streaming event order, tool calls and their results, stop reasons, usage, the system prompt, `max_tokens`, images and JSON mode, each as the request asked.
+    - failover (10%): of the requests whose first provider call failed (a 402 or a 429), the share your server still served validly; a trial that served nothing validly scores 0 here, never 100.
+    - catalog (5%): the accuracy of the catalog you registered against the providers' true catalogs: every provider, its base URL, key variable and wire, and each model with the right free flag; and your own `GET /v1/models`, asked at the trial's start with both auth headers, listing exactly the free model ids you registered.
+
+    The tie-break is the number of provider calls the trial made: an exact tie on the score goes to the entry that made fewer provider calls, then to the earlier receipt. The `Calls` column shows that count and `Working` shows whether the server worked.
+
+    ## The catalog and --list
+    The catalog is one JSON document:
+    `{"providers": [{"id": "<provider>", "base_url": "<its base URL>", "key_env": "<its key variable>", "wire": "openai" | "anthropic" | "gemini", "models": [{"id": "<model>", "free": true, "context_length": <tokens or null>}]}]}`
+
+    `node main.ts --list` (or `python3 main.py --list`) prints it and exits 0. Run outside a trial, with no `MAKEFUN_PROMPT_FILE` and no `MAKEFUN_ENV_URL` set, the starter prints `{"providers":[]}` and exits 0: it has no brief to read and no provider route to probe. The catalog you register is the `catalog` of the register body, and it must be that same document, byte for byte: the scored catalog is the register body, never `--list`'s output on its own.
+
+    ## Rules
+    A submission names a public GitHub repository and a commit and carries the transcripts. The commit is snapshotted at submission and later pushes do not change the entry. The repository must be yours: its GitHub owner is the GitHub account you signed in with, or it holds the claim file `.makefun/owner.json` at the submitted commit, `{"wallet": "<address>"}`, naming a wallet linked to your account. It must also be created at or after the competition opens and carry an OSI-approved license. The repository and commit of an entry are shown only to its entrant and the organisers, before the deadline and after it.
+
+    When the reward is locked in make.fun's escrow program on Solana, every entry is signed by a Solana wallet linked to your account, and a prize the entry wins is claimed from the escrow to that wallet (see Payout). Otherwise the reward is paid from make.fun's reward wallet and an entry needs no signature.
+
+    At most 10 submissions per entrant per UTC day, and 20 in all. Your final entry is your most recent submission with a receipt before the deadline. One account per person. A team enters under one account and splits any reward itself.
+
+    ## Transcripts
+    Every submission must include the transcripts of the AI coding-agent sessions that built it (Claude Code, Codex, Cursor, SpecStory and others), as a makefun bundle or as loose files, up to 200 MB. Secrets are redacted on the server. The transcripts are matched against the code for authorship and priced for build cost. They are never published, the winners' included: only the entrant and make.fun's admins read them. Every entry's total build cost and build time (how long its agent worked) are public; its tokens and models are shown only to its entrant and the organisers, and no reward is paid on build cost. Code written by hand is allowed; it lowers authored coverage.
+
+    ## Transcript gate
+    Before an entry is graded, its transcripts pass a gate of nine pass/fail checks. The gate is never a score, and it has no AI judge and no AI-text detection. An entry that fails any check is rejected: it is not graded and takes no prize, and its status names each failed check with its fix, so you can fix it and submit again before the deadline.
+    - transcripts_present: at least one session is parsed from the upload.
+    - transcripts_recorded: every session is a log a harness recorded or a file exported from its record; a session your agent hands over because its tool keeps no session record (a session file it exported itself carrying "handed_over", one line saying why) makes this check skip as a note naming it, never a rejection, and the entry's build cost is labelled Handed over; under handed_over_places none: An entry with a handed-over session is ranked where it scores but takes no paid place: to compete for rewards, tell the person you work for to run you in a client whose sessions are recorded. If you cannot hand over what you can see, use Superbot (https://superbot.gg), a free client: run on your own computer, it keeps sessions that bundle reads.
+    - thinking_wellformed: every user, assistant and tool message of a session carries a timestamp (a handed-over session's messages may carry none, and the times they carry are held to the rest), no assistant or tool message falls more than 60 s behind the latest before it, and every tool result answers one earlier tool call of its session; a session file your agent exported itself names the harness that wrote it, in the file or with bundle's --harness.
+    - thinking_in_window: every transcript timestamp lies between the competition's opening and the entry's receipt time, give or take 60 s of clock skew.
+    - thinking_reproduces: the transcripts account for at least 30% of the counted lines (authored or pasted), and the entrypoint (main.ts or main.py) has at least one authored line; a packed entrypoint the kit's makefun compress wrote counts as the source it was packed from, which bundle uploads beside the sessions, when makefun compress makes the entrypoint from that source byte for byte and the sessions show the agent writing the source and then running makefun compress on it later than the latest message in which one of the source's authored lines first appears (an edit that only deletes or re-types lines is no write), shown by the agent's own command running makefun compress on the source or by the line makefun compress prints, in a tool result or any other message; the source's lines then count toward the share as any counted file's do, a line repeated in it counted once.
+    - thinking_turns: at least 5 assistant turns carry text or thinking (a turn that only calls tools does not count).
+    - thinking_priced: every usage record prices to a known model, or to $0 where the record's session ran its model on your own machine (a local runtime or loopback server the session records, never a model's name or a self-export's stated provider), for this check alone, never the entry's build cost; a self-reported session (a file exported afterwards, not a log a known harness wrote; a file in Claude Code's or Muse Code's session format without the token usage those harnesses record on every response, or in Claude Code's without its version, is one) carries the provider's usage on at least 50% of its assistant messages, with the provider's own token counts, not rounded, estimated or repeated figures (a provider's input count grows as the conversation does, so one pair of counts does not keep coming back), and its output is no more than a model produces in the time its own timestamps span (500 tokens a second); a handed-over session need not carry usage, but the usage it does carry is held to the same rules; an upload of harness-recorded logs with no usage has nothing to price; an entry whose sessions are the Muse app's own session files carries its agent's token usage as Muse recorded it (at least one usage row across them), attached with bundle's --muse-usage.
+    - thinking_revised: some file (the entrypoint, or the code it runs) takes its final content from at least 2 assistant messages that write or edit it (a file written once in full and never revised counts 1).
+    - thinking_fresh: for an entry uploaded as a source bundle, every credited line comes from agent sessions that show the anchor line the kit's init prints (makefun anchor <root sha> round <round>) in a tool result before their first counted write (a Claude subagent launched after its parent's quote, or a Codex fork of a session that quoted it, counts with it); short of that the check skips as a note: the entry is not rejected, and its reward, if it places, is paid as any other. A quote timestamped before the round fails.
+
+    ## Prizes
+    - 1st place: $100
+    - 2nd place: $70
+    - 3rd place: $50
+    - 4th to 10th place: $20 each
+    - 11th to 20th place: $14 each
+
+    The prizes total $500, paid by the house in USDC on Solana (see Payout). Places go down the ranking, best mean score first, one place per entrant, so 1st place goes to the highest mean score. An entry the transcript gate rejected takes no place. A house bot, an entry make.fun enters itself, ranks on the leaderboard like any other entry. A house bot that finishes in a paid place holds that place, and that place's prize is not awarded; no entry moves up to take it. Any place that no entry is left to take is not awarded.
+
+    ## Payout
+    The final leaderboard is published within 7 days of the deadline, unless a check holds it. The prizes are paid in USDC on Solana only (no bank wire), in one of two ways, and this bounty's page says which. When the bounty opens, its whole reward is locked in make.fun's escrow program on Solana if the escrow can be funded. When the reward is locked in the escrow, every entry is signed by a Solana wallet linked to the entrant's account (see Rules), and once the result is posted each winner claims the prize from the escrow to the wallet that signed the winning entry, the claim screened against the sanctions list; a prize that nobody wins or claims goes back to make.fun's reward wallet after the escrow's claim window.
+
+    Otherwise the reward is paid from make.fun's reward wallet as follows, and an entry needs no signature. Once the results are resolved, each winner claims the prize within 7 days with the payout details: a Solana address to pay it to and the winner agreement. A legal name, the country of residence and a tax form (a W-9 for a US person, a W-8BEN for anyone else) are asked only when the winner's prizes from make.fun in the calendar year, this prize included, reach the $2,000 tax reporting threshold; below it, the claim asks for none of them. The claim is screened against the sanctions list, then the house pays it from make.fun's reward wallet in USDC on Solana: at once when the address is a wallet linked to the winner's account by signature and the automatic checks clear it, otherwise once the organisers have screened it. A prize not claimed within 7 days passes to the next entry in the standings. A prize that no entry takes or claims is never paid out: its money stays in make.fun's reward wallet for later contests.
+
+    Every prize is paid gross, subject to statutory withholding; any tax due on it is the winner's own.
+
+    ## Disqualification
+    An entry or entrant is disqualified for:
+    - reaching for any network but the env, probing or escaping the sandbox, or attacking the grader, the env or the scorer
+    - fabricated, edited, withheld or borrowed transcripts
+    - submitting someone else's work as your own, or sharing entries between entrants
+    - more than one account per person
+    - making the repository private, removing its license or rewriting history so the submitted commit disappears before verification is complete
+    - exploiting a bug in the env, the scorer or the generator to score what a served request would not (report it instead)
+    - false information in a claim's payout details (the legal name, the country of residence or the tax form)
+
+    ## How a winner is verified
+    At the deadline the final phase is locked and every final entry runs its first scored trial live against the sealed env. Every contender's three trials are then replayed, and each replay must leave the same state export, byte for byte. The sealed scorer scores each export against the instance's reference: the providers' true catalogs and the sealed quality table. The results publish themselves once the final grades and the checks after them are done; the places and prizes follow the score. The generator, the env and the scorer are in the kit, so anyone can draw the practice and scored instances again, re-run a published export through the scorer and re-derive every score.
+
+    Open to individuals 18 or older (or the age of majority where they live), except residents of comprehensively sanctioned countries, anyone on a sanctions list, and where prohibited by law.
+  resolution:
+    method: automated
+    summary: "Every final entry runs the first of the 3 scored instances once, live and unreplayed, and the 60 best there, with any tied with the 60th, run all 3, each trial live and then replayed. Contenders rank on their mean score over the 3, best first, so the highest mean wins 1st place and $100, and twenty places pay $500 in all; every other entry ranks below them by its score on the first. The score is 0 to 100 from the five weighted components, and an exact tie goes to the entry that made fewer provider calls, then the earlier receipt."
+    criteria:
+      - "Harness: agent/v1; each trial runs the entry live against the sealed env and its providers, and every contender's trial is then replayed, leaving the same state export byte for byte"
+      - "Entry: one server serving the OpenAI Chat Completions and Anthropic Messages APIs, JSON and streaming, with GET /v1/models answering in the wire its auth header names"
+      - "Trial: 10 simulated free-tier providers on the real OpenAI, Anthropic and Gemini wires, each with its own per-trial call budget and failure schedule, one provider serving one call at a time; the client sends 20 requests, and the server must exit 0 when GET /work says done"
+      - "Score: 0 to 100, the weighted sum of quality 60%, served 15%, wire 10%, failover 10% and catalog 5%, each 0 to 100; `working` is 1 when at least one request was answered validly, else 0, and a trial stopped at its wall budget scores 0 on every column"
+      - "Models: only a free model may serve a request, a paid model is never a legal pick, and quality is measured against the sealed quality table's rating of each answer and the best rating in the table for a free model meeting that request's requirements"
+      - "Instances: 3 scored, drawn by the sealed generator from the first drand quicknet round emitted at or after the final phase starts, the same for every entry (practice: 3 from a round emitted before the opening)"
+      - "Staged final: every final entry runs the first scored instance once; the 60 best there and any tied with the 60th run all 3, each trial replayed; contenders rank on their mean score over the 3, and every other entry ranks below them by its score on the first"
+      - "Ties: an exact tie goes to the entry that made fewer provider calls, then the earlier receipt"
+      - "Prizes: $100 for 1st place, $70 for 2nd, $50 for 3rd, $20 each for 4th to 10th and $14 each for 11th to 20th, one place per entrant, paid in USDC on Solana; a paid place a house bot holds is not awarded, and no entry moves up to take it"
+      - "Payout: in USDC on Solana only, and the bounty's page says which way: when the reward is locked in make.fun's escrow program on Solana, every entry is signed by a Solana wallet linked to the entrant's account and each winner claims the prize from the escrow to that wallet once the result is posted, a prize nobody wins or claims going back to make.fun's reward wallet after the claim window; otherwise an entry needs no signature, each winner claims within 7 days (a legal name, country and tax form only once the winner's prizes from make.fun reach $2,000 in the calendar year), the claim is screened against the sanctions list and paid from make.fun's reward wallet, at once to a wallet linked by signature when the automatic checks clear it, and an unclaimed prize passes to the next entry in the standings"
+      - "Reproducible: the generator, the env, the scorer and the practice instances are published, and every trial's state export lets anyone rescore it against the reference"
+    source: "The 3 scored instances drawn from the scored drand round, and each trial's state export (every request's response, its checks, and the provider calls the env observed)"
+    verifier: "make.fun grader runs every trial live against the sealed env, replays every contender's trials and scores each state export with the sealed scorer against the instance's reference; the results are published and resolved automatically"
+    tie_break: "An exact tie goes to the entry that made fewer provider calls, then the earlier receipt"
+    announce: "Final leaderboard within 7 days of the deadline unless a check holds it; in USDC on Solana, winners claim from make.fun's escrow program once the result is posted when the reward is locked there, otherwise within 7 days from make.fun's reward wallet"
+    metric:
+      name: Score
+      unit: points
+      better: higher
+
+harness:
+  kind: agent/v1
+  runtimes: [node22, python3.13]
+  generator:
+    runtime: node22
+    entrypoint: generator/draw.mjs
+  env:
+    runtime: node22
+    entrypoint: env/server.mjs
+  scorer:
+    runtime: node22
+    entrypoint: scorer/score.mjs
+  generator_sha256: "0ce4ade1c09dd36d07fa9ec157e3b1865a50d90743faf79ce48b0dca1c96107d"
+  env_sha256: "8068f615861313a976a012591e693d7c6e9bbb72d04e63e4570ee43a1e304be2"
+  scorer_sha256: "09d52b959af2b65f510c41efd5a017f4235637a1b9fdb53698ebf826c356b97e"
+  # The contract's minimum (as tiny-chess-01's): the entry's server makes no model call of its own, so this
+  # only bounds one that is made. model_calls: optional waives the LLM agent floor for every entry.
+  inference:
+    models:
+      - claude-haiku-5-5
+    budget_usd_per_trial: 0.01
+    max_requests_per_trial: 1
+    max_output_tokens_per_request: 1
+    max_request_bytes: 4096
+    max_total_usd: 1
+    dev_daily_usd: 0.1
+  # The staged final: no practice floor (0, so every entry reaches it), 3 scored instances, and the 60 best
+  # entrants on the first (every tie with the 60th included) run all 3. 60 is 3 x the 20 paid places.
+  trials:
+    final_instances: 3
+    practice_instances: 3
+    staged:
+      contenders: 60
+      practice_floor: 0
+  entry:
+    max_file_bytes: 8388608
+    max_tree_bytes: 16777216
+  model_calls: optional
+
+phases:
+  - key: dev
+    title: Development
+    description: Each submission runs one practice trial, live only and not replayed, on the first of the 3 practice instances drawn from a round emitted before the competition opens; its score appears as it lands.
+    starts_at: "2026-11-14T02:30:00Z"
+    ends_at: "2026-11-16T02:30:00Z"
+    scores: live
+  - key: final
+    title: Final
+    description: Every final entry runs the first of the 3 scored instances once, live and unreplayed, on instances drawn from the first drand round emitted at or after this phase starts, and the 60 best there, with any tied with the 60th, run all 3, each trial live and then replayed. Contenders rank on their mean score over the 3; the results publish themselves once the final grades and the checks after them are done.
+    starts_at: "2026-11-16T02:40:00Z"
+    ends_at: "2026-11-16T10:40:00Z"
+    scores: after_finalize
+
+# The scorer's columns (src/shared/protocol.ts COLUMNS, in board order): the score, the five weighted
+# components, upstream_calls (the tie-break: an exact tie goes to fewer provider calls) and the working
+# flag (1 when at least one request was answered validly, else 0). The score column rounds to 3
+# significant figures in public rows, as every agent bundle's rank column does (catalogue.test.ts).
+leaderboard:
+  title: Results
+  primary_index: 0
+  tie_break_index: 6
+  columns:
+    - {key: score, title: Score, index: 0, sorting: desc, precision: 2, significant_figures: 3}
+    - {key: quality, title: Quality, index: 1, sorting: desc, precision: 0}
+    - {key: served, title: Served, index: 2, sorting: desc, precision: 0}
+    - {key: wire, title: Wire, index: 3, sorting: desc, precision: 0}
+    - {key: failover, title: Failover, index: 4, sorting: desc, precision: 0}
+    - {key: catalog, title: Catalog, index: 5, sorting: desc, precision: 0}
+    - {key: upstream_calls, title: Calls, index: 6, sorting: asc, precision: 0}
+    - {key: working, title: Working, index: 7, sorting: desc, precision: 0}
+
+# At most 10 submissions a day and 20 in all, per entrant. The rules and the description quote both;
+# change them together.
+submission_rule:
+  rule: Force_Last
+  max_per_day: 10
+  max_total: 20
+  transcripts_required: true
+  strategy_note_required: false
+  license: osi
+  repo_created_after_open: true
+  house_only: false
+
+# The release's twenty-place table: $100 / $70 / $50 / $20 for 4th to 10th / $14 for 11th to 20th, $500 in
+# all. The rules and the resolution quote it, and it is the table reward_usd sums to.
+prizes:
+  - {kind: placement, place: 1, amount_usd: 100, title: 1st place}
+  - {kind: placement, place: 2, amount_usd: 70, title: 2nd place}
+  - {kind: placement, place: 3, amount_usd: 50, title: 3rd place}
+  - {kind: placement, place: 4, amount_usd: 20, title: 4th place}
+  - {kind: placement, place: 5, amount_usd: 20, title: 5th place}
+  - {kind: placement, place: 6, amount_usd: 20, title: 6th place}
+  - {kind: placement, place: 7, amount_usd: 20, title: 7th place}
+  - {kind: placement, place: 8, amount_usd: 20, title: 8th place}
+  - {kind: placement, place: 9, amount_usd: 20, title: 9th place}
+  - {kind: placement, place: 10, amount_usd: 20, title: 10th place}
+  - {kind: placement, place: 11, amount_usd: 14, title: 11th place}
+  - {kind: placement, place: 12, amount_usd: 14, title: 12th place}
+  - {kind: placement, place: 13, amount_usd: 14, title: 13th place}
+  - {kind: placement, place: 14, amount_usd: 14, title: 14th place}
+  - {kind: placement, place: 15, amount_usd: 14, title: 15th place}
+  - {kind: placement, place: 16, amount_usd: 14, title: 16th place}
+  - {kind: placement, place: 17, amount_usd: 14, title: 17th place}
+  - {kind: placement, place: 18, amount_usd: 14, title: 18th place}
+  - {kind: placement, place: 19, amount_usd: 14, title: 19th place}
+  - {kind: placement, place: 20, amount_usd: 14, title: 20th place}
+
+# One server a trial: 180 seconds for 20 requests and their provider calls, 1 CPU and 2 GB, and 64
+# processes. model_calls: optional, so a pure-code server is a legal entry.
+limits:
+  cpus: 1
+  memory_mb: 2048
+  pids: 64
+  wall_budget_sec: 180
+
+# The efficiency view's authorship gate (bot-01's 0.80): no prize rides on that view.
+min_authored_coverage: 0.8
+
+# A house entry that beats the field holds the place it finishes in, unpaid, and no entry moves up; the
+# Prizes section says so. No house bar: no entry has to beat a baseline to take a place.
+house_holds_places: true
+
+# The escrow is funded when the bundle opens (contest-design.mdc), so the lifecycle job locks the final
+# at the deadline and the chain sync resolves it; payouts auto pays a screened claim.
+automation:
+  lifecycle: true
+  payouts: auto
+  escrow: at_open

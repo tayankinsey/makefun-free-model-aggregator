@@ -1,0 +1,637 @@
+{
+  "schema": "free-model-aggregator-01/workload/v1",
+  "manifest": [
+    {
+      "id": "r01",
+      "api": "openai",
+      "stream": false,
+      "weight": 2,
+      "requires": {
+        "tools": true,
+        "vision": true
+      }
+    },
+    {
+      "id": "r02",
+      "api": "openai",
+      "stream": true,
+      "weight": 2,
+      "requires": {
+        "tools": true,
+        "vision": true
+      }
+    },
+    {
+      "id": "r03",
+      "api": "openai",
+      "stream": false,
+      "weight": 2,
+      "requires": {
+        "tools": true
+      }
+    },
+    {
+      "id": "r04",
+      "api": "anthropic",
+      "stream": false,
+      "weight": 2,
+      "requires": {
+        "tools": true
+      }
+    },
+    {
+      "id": "r05",
+      "api": "anthropic",
+      "stream": true,
+      "weight": 2,
+      "requires": {
+        "tools": true
+      }
+    },
+    {
+      "id": "r06",
+      "api": "openai",
+      "stream": true,
+      "weight": 2,
+      "requires": {
+        "vision": true
+      }
+    },
+    {
+      "id": "r07",
+      "api": "openai",
+      "stream": false,
+      "weight": 1,
+      "requires": {
+        "json": true
+      }
+    },
+    {
+      "id": "r08",
+      "api": "anthropic",
+      "stream": false,
+      "weight": 1,
+      "requires": {
+        "json": true
+      }
+    },
+    {
+      "id": "r09",
+      "api": "anthropic",
+      "stream": true,
+      "weight": 1,
+      "requires": {
+        "json": true
+      }
+    },
+    {
+      "id": "r10",
+      "api": "openai",
+      "stream": false,
+      "weight": 1,
+      "requires": {
+        "min_context": 200000
+      }
+    },
+    {
+      "id": "r11",
+      "api": "openai",
+      "stream": true,
+      "weight": 1,
+      "requires": {
+        "min_context": 200000
+      }
+    },
+    {
+      "id": "r12",
+      "api": "anthropic",
+      "stream": false,
+      "weight": 1,
+      "requires": {
+        "min_context": 200000
+      }
+    },
+    {
+      "id": "r13",
+      "api": "openai",
+      "stream": false,
+      "weight": 1,
+      "requires": {}
+    },
+    {
+      "id": "r14",
+      "api": "openai",
+      "stream": false,
+      "weight": 1,
+      "requires": {}
+    },
+    {
+      "id": "r15",
+      "api": "openai",
+      "stream": false,
+      "weight": 1,
+      "requires": {}
+    },
+    {
+      "id": "r16",
+      "api": "anthropic",
+      "stream": false,
+      "weight": 1,
+      "requires": {}
+    },
+    {
+      "id": "r17",
+      "api": "anthropic",
+      "stream": true,
+      "weight": 1,
+      "requires": {}
+    },
+    {
+      "id": "r18",
+      "api": "openai",
+      "stream": true,
+      "weight": 1,
+      "requires": {}
+    },
+    {
+      "id": "r19",
+      "api": "openai",
+      "stream": false,
+      "weight": 1,
+      "requires": {}
+    },
+    {
+      "id": "r20",
+      "api": "anthropic",
+      "stream": true,
+      "weight": 1,
+      "requires": {}
+    }
+  ],
+  "bodies": {
+    "r01": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "A customer complaint arrived as the attached image. Read it, find the account id it names, call lookup_customer for that account, and if the complaint is about a charge call create_ticket with priority urgent.\n\n[request nonce 76b1d0953d727670]"
+            },
+            {
+              "type": "image_url",
+              "image_url": {
+                "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+              }
+            }
+          ]
+        }
+      ],
+      "max_tokens": 433,
+      "temperature": 0.31,
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "lookup_customer",
+            "description": "Look up one customer account by its account id and return its plan, status and last invoice.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "string",
+                  "description": "The account id, four digits."
+                },
+                "include_history": {
+                  "type": "boolean",
+                  "description": "Whether to include the last twelve invoices."
+                }
+              },
+              "required": [
+                "account_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "tool_choice": "auto"
+    },
+    "r02": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Look at the attached screenshot of the billing dashboard and summarise it for the operations channel, then call create_ticket with a subject naming the problem and a priority.\n\n[request nonce c4d09b1c380cc1c1]"
+            },
+            {
+              "type": "image_url",
+              "image_url": {
+                "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+              }
+            }
+          ]
+        }
+      ],
+      "max_tokens": 467,
+      "temperature": 0.98,
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "lookup_customer",
+            "description": "Look up one customer account by its account id and return its plan, status and last invoice.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "string",
+                  "description": "The account id, four digits."
+                },
+                "include_history": {
+                  "type": "boolean",
+                  "description": "Whether to include the last twelve invoices."
+                }
+              },
+              "required": [
+                "account_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "tool_choice": "auto",
+      "stop": [
+        "\n\n###"
+      ],
+      "stream": true
+    },
+    "r03": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Find account 8812 with lookup_customer and open one ticket for its overdue invoice with create_ticket. Use the tools you are given; do not guess an account id.\n\n[request nonce bf0a29ddccea597a]"
+        }
+      ],
+      "max_tokens": 233,
+      "temperature": 0.02,
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "lookup_customer",
+            "description": "Look up one customer account by its account id and return its plan, status and last invoice.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "string",
+                  "description": "The account id, four digits."
+                },
+                "include_history": {
+                  "type": "boolean",
+                  "description": "Whether to include the last twelve invoices."
+                }
+              },
+              "required": [
+                "account_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "create_ticket",
+            "description": "Open one support ticket and return its id and queue.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "subject": {
+                  "type": "string",
+                  "description": "One line naming the problem."
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "normal",
+                    "urgent"
+                  ],
+                  "description": "How soon the queue must pick it up."
+                }
+              },
+              "required": [
+                "subject",
+                "priority"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "tool_choice": "auto"
+    },
+    "r04": {
+      "model": "auto",
+      "max_tokens": 456,
+      "system": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses.",
+      "messages": [
+        {
+          "role": "user",
+          "content": "The nightly billing job failed on account 4407. Look the account up and open one urgent ticket describing the failure and the account plan.\n\n[request nonce 6ede1236a47f0f90]"
+        }
+      ],
+      "temperature": 0.64,
+      "tools": [
+        {
+          "name": "lookup_customer",
+          "description": "Look up one customer account by its account id and return its plan, status and last invoice.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "account_id": {
+                "type": "string",
+                "description": "The account id, four digits."
+              },
+              "include_history": {
+                "type": "boolean",
+                "description": "Whether to include the last twelve invoices."
+              }
+            },
+            "required": [
+              "account_id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "r05": {
+      "model": "auto",
+      "max_tokens": 378,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Check account 5402 for its refund window, then open the matching ticket. Two calls at most.\n\n[request nonce fbb0199b3da0b194]"
+        }
+      ],
+      "temperature": 0.11,
+      "tools": [
+        {
+          "name": "lookup_customer",
+          "description": "Look up one customer account by its account id and return its plan, status and last invoice.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "account_id": {
+                "type": "string",
+                "description": "The account id, four digits."
+              },
+              "include_history": {
+                "type": "boolean",
+                "description": "Whether to include the last twelve invoices."
+              }
+            },
+            "required": [
+              "account_id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "stop_sequences": [
+        "\n\nHuman:"
+      ],
+      "stream": true
+    },
+    "r06": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "What does this chart show? Name the trend and the one outlier the annotation points at, in two sentences.\n\n[request nonce b4edd25026942e1f]"
+            },
+            {
+              "type": "image_url",
+              "image_url": {
+                "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+              }
+            }
+          ]
+        }
+      ],
+      "max_tokens": 253,
+      "temperature": 0.12,
+      "stream": true
+    },
+    "r07": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Classify the following support message as billing, bug or feature, and give a confidence from 0 to 1. Answer with one JSON object: {\"label\": \"...\", \"confidence\": 0.0}. Message: \"Your last deploy removed the export button from the invoices page.\"\n\n[request nonce ec1eaa06b69a2638]"
+        }
+      ],
+      "max_tokens": 344,
+      "temperature": 0.52,
+      "response_format": {
+        "type": "json_object"
+      }
+    },
+    "r08": {
+      "model": "auto",
+      "max_tokens": 367,
+      "system": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses.",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Extract the invoice fields from this text and answer with one JSON object {\"vendor\": \"...\", \"total\": \"...\", \"due\": \"...\"}. Text: \"Northwind Traders, invoice 2291, total 1,284.50 EUR, due on the fourteenth.\"\n\n[request nonce 959013dc2a6ccf19]"
+        }
+      ],
+      "temperature": 0.53,
+      "stop_sequences": [
+        "\n\nHuman:"
+      ]
+    },
+    "r09": {
+      "model": "auto",
+      "max_tokens": 371,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Turn this changelog into one JSON object of arrays {\"added\": [], \"fixed\": [], \"removed\": []}. Changelog: \"Added CSV export. Fixed the timezone in the digest. Removed the legacy billing tab.\"\n\n[request nonce c9b3156b2737a04e]"
+        }
+      ],
+      "temperature": 0.27,
+      "stream": true
+    },
+    "r10": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses."
+        },
+        {
+          "role": "user",
+          "content": "Here is a service log. Find the first error and the request id that caused the burst that follows it, and answer in one sentence.\n\nThe log:\n\nseq=0001 level=warn module=worker account=2796 took_ms=812 msg=retry scheduled\nseq=0002 level=info module=ingest account=7553 took_ms=41 msg=handled\nseq=0003 level=info module=search account=1981 took_ms=182 msg=handled\nseq=0004 level=info module=gateway account=9737 took_ms=344 msg=handled\nseq=0005 level=info module=gateway account=8338 took_ms=181 msg=handled\nseq=0006 level=info module=worker account=1625 took_ms=887 msg=handled\nseq=0007 level=warn module=gateway account=1486 took_ms=539 msg=retry scheduled\nseq=0008 level=error module=ingest account=8661 took_ms=701 msg=upstream timeout\nseq=0009 level=error module=billing account=3367 took_ms=320 msg=upstream timeout\nseq=0010 level=info module=ingest account=1546 took_ms=80 msg=handled\nseq=0011 level=info module=billing account=1369 took_ms=721 msg=handled\nseq=0012 level=error module=ingest account=6197 took_ms=787 msg=upstream timeout\nseq=0013 level=info module=worker account=4496 took_ms=866 msg=handled\nseq=0014 level=info module=gateway account=6823 took_ms=708 msg=handled\nseq=0015 level=info module=search account=7871 took_ms=587 msg=handled\nseq=0016 level=info module=search account=2669 took_ms=514 msg=handled\nseq=0017 level=info module=gateway account=9485 took_ms=443 msg=handled\nseq=0018 level=info module=gateway account=6512 took_ms=145 msg=handled\nseq=0019 level=info module=worker account=9140 took_ms=326 msg=handled\nseq=0020 level=info module=gateway account=7228 took_ms=297 msg=handled\nseq=0021 level=info module=gateway account=7629 took_ms=637 msg=handled\nseq=0022 level=info module=billing account=8688 took_ms=564 msg=handled\nseq=0023 level=warn module=billing account=6374 took_ms=614 msg=retry scheduled\nseq=0024 level=info module=ingest account=2407 took_ms=56 msg=handled\nseq=0025 level=info module=ingest account=4362 took_ms=324 msg=handled\nseq=0026 level=info module=billing account=9062 took_ms=337 msg=handled\nseq=0027 level=info module=search account=8822 took_ms=415 msg=handled\nseq=0028 level=info module=gateway account=8037 took_ms=334 msg=handled\nseq=0029 level=error module=ingest account=8135 took_ms=171 msg=upstream timeout\nseq=0030 level=error module=ingest account=4641 took_ms=183 msg=upstream timeout\nseq=0031 level=warn module=gateway account=9846 took_ms=386 msg=retry scheduled\nseq=0032 level=error module=gateway account=7902 took_ms=259 msg=upstream timeout\nseq=0033 level=error module=search account=4967 took_ms=236 msg=upstream timeout\nseq=0034 level=error module=billing account=8925 took_ms=668 msg=upstream timeout\nseq=0035 level=info module=billing account=9203 took_ms=278 msg=handled\nseq=0036 level=info module=billing account=5429 took_ms=816 msg=handled\nseq=0037 level=info module=gateway account=2402 took_ms=897 msg=handled\nseq=0038 level=info module=gateway account=5007 took_ms=793 msg=handled\nseq=0039 level=info module=ingest account=9301 took_ms=853 msg=handled\nseq=0040 level=error module=billing account=5969 took_ms=604 msg=upstream timeout\nseq=0041 level=error module=billing account=9841 took_ms=244 msg=upstream timeout\nseq=0042 level=info module=ingest account=8850 took_ms=112 msg=handled\nseq=0043 level=warn module=gateway account=7626 took_ms=844 msg=retry scheduled\nseq=0044 level=error module=ingest account=8233 took_ms=297 msg=upstream timeout\nseq=0045 level=warn module=worker account=8620 took_ms=719 msg=retry scheduled\nseq=0046 level=info module=worker account=4168 took_ms=136 msg=handled\nseq=0047 level=info module=gateway account=2976 took_ms=479 msg=handled\nseq=0048 level=info module=gateway account=4996 took_ms=549 msg=handled\nseq=0049 level=warn module=search account=1178 took_ms=843 msg=retry scheduled\nseq=0050 level=warn module=gateway account=2331 took_ms=500 msg=retry scheduled\nseq=0051 level=info module=ingest account=2440 took_ms=693 msg=handled\nseq=0052 level=info module=billing account=5709 took_ms=718 msg=handled\nseq=0053 level=info module=gateway account=1127 took_ms=530 msg=handled\nseq=0054 level=info module=ingest account=7625 took_ms=259 msg=handled\nseq=0055 level=info module=billing account=7675 took_ms=875 msg=handled\nseq=0056 level=warn module=search account=2863 took_ms=482 msg=retry scheduled\nseq=0057 level=error module=billing account=5900 took_ms=743 msg=upstream timeout\nseq=0058 level=info module=search account=9757 took_ms=355 msg=handled\nseq=0059 level=info module=search account=6047 took_ms=295 msg=handled\nseq=0060 level=error module=gateway account=9780 took_ms=833 msg=upstream timeout\nseq=0061 level=error module=search account=5043 took_ms=547 msg=upstream timeout\nseq=0062 level=info module=worker account=2965 took_ms=326 msg=handled\nseq=0063 level=info module=search account=5260 took_ms=571 msg=handled\nseq=0064 level=error module=search account=4799 took_ms=418 msg=upstream timeout\nseq=0065 level=error module=worker account=9075 took_ms=455 msg=upstream timeout\nseq=0066 level=info module=billing account=7764 took_ms=65 msg=handled\nseq=0067 level=info module=ingest account=5236 took_ms=60 msg=handled\nseq=0068 level=warn module=gateway account=9900 took_ms=487 msg=retry scheduled\nseq=0069 level=warn module=gateway account=2873 took_ms=117 msg=retry scheduled\nseq=0070 level=info module=ingest account=8643 took_ms=891 msg=handled\nseq=0071 level=info module=gateway account=5654 took_ms=447 msg=handled\nseq=0072 level=info module=ingest account=6814 took_ms=210 msg=handled\nseq=0073 level=warn module=gateway account=7576 took_ms=612 msg=retry scheduled\nseq=0074 level=error module=gateway account=7900 took_ms=596 msg=upstream timeout\nseq=0075 level=error module=billing account=4102 took_ms=647 msg=upstream timeout\nseq=0076 level=warn module=gateway account=6917 took_ms=168 msg=retry scheduled\nseq=0077 level=info module=billing account=4877 took_ms=377 msg=handled\nseq=0078 level=warn module=worker account=3776 took_ms=284 msg=retry scheduled\nseq=0079 level=error module=worker account=5039 took_ms=352 msg=upstream timeout\nseq=0080 level=error module=billing account=4393 took_ms=335 msg=upstream timeout\nseq=0081 level=warn module=billing account=7290 took_ms=389 msg=retry scheduled\nseq=0082 level=warn module=ingest account=7915 took_ms=826 msg=retry scheduled\nseq=0083 level=info module=search account=8530 took_ms=845 msg=handled\nseq=0084 level=info module=search account=7984 took_ms=49 msg=handled\nseq=0085 level=info module=gateway account=4624 took_ms=281 msg=handled\nseq=0086 level=error module=billing account=2142 took_ms=808 msg=upstream timeout\nseq=0087 level=info module=gateway account=7347 took_ms=32 msg=handled\nseq=0088 level=error module=search account=2143 took_ms=625 msg=upstream timeout\nseq=0089 level=info module=billing account=2775 took_ms=846 msg=handled\nseq=0090 level=warn module=billing account=3773 took_ms=729 msg=retry scheduled\nseq=0091 level=error module=ingest account=4812 took_ms=789 msg=upstream timeout\nseq=0092 level=warn module=worker account=8766 took_ms=609 msg=retry scheduled\nseq=0093 level=error module=worker account=9023 took_ms=359 msg=upstream timeout\nseq=0094 level=warn module=search account=8872 took_ms=420 msg=retry scheduled\nseq=0095 level=error module=ingest account=1926 took_ms=248 msg=upstream timeout\nseq=0096 level=info module=search account=8157 took_ms=98 msg=handled\nseq=0097 level=info module=ingest account=1995 took_ms=539 msg=handled\nseq=0098 level=info module=gateway account=9388 took_ms=475 msg=handled\nseq=0099 level=warn module=billing account=5780 took_ms=878 msg=retry scheduled\nseq=0100 level=info module=worker account=6187 took_ms=443 msg=handled\nseq=0101 level=info module=worker account=2841 took_ms=93 msg=handled\nseq=0102 level=info module=search account=7474 took_ms=378 msg=handled\nseq=0103 level=info module=ingest account=2893 took_ms=197 msg=handled\nseq=0104 level=warn module=worker account=3250 took_ms=751 msg=retry scheduled\nseq=0105 level=info module=ingest account=3887 took_ms=893 msg=handled\nseq=0106 level=info module=gateway account=5492 took_ms=249 msg=handled\nseq=0107 level=info module=ingest account=6090 took_ms=539 msg=handled\nseq=0108 level=info module=worker account=2436 took_ms=18 msg=handled\nseq=0109 level=error module=ingest account=7095 took_ms=458 msg=upstream timeout\nseq=0110 level=info module=gateway account=6692 took_ms=858 msg=handled\nseq=0111 level=info module=worker account=7627 took_ms=670 msg=handled\nseq=0112 level=info module=billing account=3490 took_ms=703 msg=handled\nseq=0113 level=info module=search account=8148 took_ms=658 msg=handled\nseq=0114 level=error module=ingest account=4997 took_ms=159 msg=upstream timeout\nseq=0115 level=info module=ingest account=7666 took_ms=446 msg=handled\nseq=0116 level=warn module=gateway account=8687 took_ms=836 msg=retry scheduled\nseq=0117 level=info module=worker account=3720 took_ms=360 msg=handled\nseq=0118 level=info module=gateway account=3428 took_ms=767 msg=handled\nseq=0119 level=error module=ingest account=8510 took_ms=328 msg=upstream timeout\nseq=0120 level=error module=gateway account=2510 took_ms=315 msg=upstream timeout\nseq=0121 level=info module=ingest account=2611 took_ms=528 msg=handled\nseq=0122 level=info module=worker account=4739 took_ms=751 msg=handled\nseq=0123 level=info module=search account=1764 took_ms=146 msg=handled\nseq=0124 level=info module=billing account=9267 took_ms=217 msg=handled\nseq=0125 level=warn module=gateway account=2991 took_ms=602 msg=retry scheduled\nseq=0126 level=warn module=gateway account=5653 took_ms=9 msg=retry scheduled\nseq=0127 level=warn module=billing account=2614 took_ms=20 msg=retry scheduled\nseq=0128 level=info module=gateway account=3451 took_ms=241 msg=handled\nseq=0129 level=info module=worker account=2704 took_ms=786 msg=handled\nseq=0130 level=info module=search account=1554 took_ms=140 msg=handled\nseq=0131 level=info module=worker account=2104 took_ms=640 msg=handled\nseq=0132 level=info module=ingest account=2003 took_ms=404 msg=handled\nseq=0133 level=info module=search account=4549 took_ms=713 msg=handled\nseq=0134 level=info module=gateway account=3108 took_ms=791 msg=handled\nseq=0135 level=warn module=billing account=9220 took_ms=599 msg=retry scheduled\nseq=0136 level=error module=gateway account=3794 took_ms=365 msg=upstream timeout\nseq=0137 level=info module=gateway account=1029 took_ms=152 msg=handled\nseq=0138 level=info module=billing account=3092 took_ms=253 msg=handled\nseq=0139 level=info module=billing account=1921 took_ms=35 msg=handled\nseq=0140 level=error module=gateway account=3737 took_ms=188 msg=upstream timeout\n\n[request nonce 0a1b2fcb8ce64951]"
+        }
+      ],
+      "max_tokens": 147,
+      "temperature": 0.31
+    },
+    "r11": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Here is a rollout log. Say which step first exceeded its latency budget, and by how much, in one sentence.\n\nThe log:\n\nseq=0001 level=warn module=ingest account=4709 took_ms=275 msg=retry scheduled\nseq=0002 level=warn module=ingest account=2370 took_ms=196 msg=retry scheduled\nseq=0003 level=info module=billing account=8492 took_ms=370 msg=handled\nseq=0004 level=error module=billing account=4101 took_ms=57 msg=upstream timeout\nseq=0005 level=error module=billing account=1436 took_ms=732 msg=upstream timeout\nseq=0006 level=error module=worker account=8663 took_ms=832 msg=upstream timeout\nseq=0007 level=error module=worker account=5773 took_ms=481 msg=upstream timeout\nseq=0008 level=warn module=billing account=3732 took_ms=214 msg=retry scheduled\nseq=0009 level=info module=worker account=2861 took_ms=144 msg=handled\nseq=0010 level=info module=ingest account=6244 took_ms=180 msg=handled\nseq=0011 level=info module=billing account=6364 took_ms=206 msg=handled\nseq=0012 level=info module=gateway account=8475 took_ms=761 msg=handled\nseq=0013 level=info module=worker account=1069 took_ms=422 msg=handled\nseq=0014 level=warn module=ingest account=1831 took_ms=132 msg=retry scheduled\nseq=0015 level=info module=billing account=9631 took_ms=435 msg=handled\nseq=0016 level=info module=ingest account=3623 took_ms=536 msg=handled\nseq=0017 level=info module=ingest account=9750 took_ms=530 msg=handled\nseq=0018 level=info module=search account=6541 took_ms=795 msg=handled\nseq=0019 level=info module=gateway account=7347 took_ms=534 msg=handled\nseq=0020 level=info module=gateway account=5550 took_ms=670 msg=handled\nseq=0021 level=info module=ingest account=6796 took_ms=713 msg=handled\nseq=0022 level=error module=search account=5813 took_ms=47 msg=upstream timeout\nseq=0023 level=error module=ingest account=9437 took_ms=369 msg=upstream timeout\nseq=0024 level=error module=gateway account=6588 took_ms=300 msg=upstream timeout\nseq=0025 level=error module=search account=6616 took_ms=282 msg=upstream timeout\nseq=0026 level=warn module=search account=5925 took_ms=283 msg=retry scheduled\nseq=0027 level=error module=search account=6023 took_ms=260 msg=upstream timeout\nseq=0028 level=info module=search account=6047 took_ms=108 msg=handled\nseq=0029 level=info module=worker account=7968 took_ms=867 msg=handled\nseq=0030 level=info module=gateway account=8908 took_ms=335 msg=handled\nseq=0031 level=info module=billing account=1876 took_ms=203 msg=handled\nseq=0032 level=info module=gateway account=3672 took_ms=643 msg=handled\nseq=0033 level=info module=worker account=1833 took_ms=466 msg=handled\nseq=0034 level=warn module=gateway account=9549 took_ms=42 msg=retry scheduled\nseq=0035 level=warn module=worker account=3236 took_ms=278 msg=retry scheduled\nseq=0036 level=warn module=billing account=9413 took_ms=80 msg=retry scheduled\nseq=0037 level=info module=search account=7998 took_ms=88 msg=handled\nseq=0038 level=info module=billing account=7586 took_ms=96 msg=handled\nseq=0039 level=info module=billing account=5867 took_ms=249 msg=handled\nseq=0040 level=info module=worker account=2863 took_ms=71 msg=handled\nseq=0041 level=warn module=billing account=3515 took_ms=603 msg=retry scheduled\nseq=0042 level=error module=ingest account=7053 took_ms=751 msg=upstream timeout\nseq=0043 level=info module=worker account=8280 took_ms=422 msg=handled\nseq=0044 level=info module=gateway account=8055 took_ms=833 msg=handled\nseq=0045 level=info module=billing account=7774 took_ms=55 msg=handled\nseq=0046 level=error module=search account=7926 took_ms=271 msg=upstream timeout\nseq=0047 level=info module=search account=7580 took_ms=374 msg=handled\nseq=0048 level=error module=ingest account=4036 took_ms=390 msg=upstream timeout\nseq=0049 level=info module=search account=1334 took_ms=700 msg=handled\nseq=0050 level=warn module=search account=1421 took_ms=238 msg=retry scheduled\nseq=0051 level=error module=gateway account=3112 took_ms=217 msg=upstream timeout\nseq=0052 level=warn module=billing account=5777 took_ms=121 msg=retry scheduled\nseq=0053 level=error module=worker account=6344 took_ms=554 msg=upstream timeout\nseq=0054 level=error module=ingest account=2027 took_ms=124 msg=upstream timeout\nseq=0055 level=warn module=search account=3455 took_ms=148 msg=retry scheduled\nseq=0056 level=info module=worker account=9591 took_ms=220 msg=handled\nseq=0057 level=info module=gateway account=9324 took_ms=351 msg=handled\nseq=0058 level=error module=gateway account=4101 took_ms=218 msg=upstream timeout\nseq=0059 level=warn module=search account=8642 took_ms=543 msg=retry scheduled\nseq=0060 level=info module=billing account=6084 took_ms=297 msg=handled\nseq=0061 level=info module=search account=1398 took_ms=358 msg=handled\nseq=0062 level=info module=search account=2183 took_ms=851 msg=handled\nseq=0063 level=info module=ingest account=3471 took_ms=239 msg=handled\nseq=0064 level=info module=search account=1864 took_ms=374 msg=handled\nseq=0065 level=info module=gateway account=1987 took_ms=698 msg=handled\nseq=0066 level=error module=worker account=4447 took_ms=111 msg=upstream timeout\nseq=0067 level=info module=search account=1457 took_ms=454 msg=handled\nseq=0068 level=info module=billing account=7045 took_ms=761 msg=handled\nseq=0069 level=info module=worker account=2972 took_ms=674 msg=handled\nseq=0070 level=error module=billing account=4111 took_ms=173 msg=upstream timeout\nseq=0071 level=info module=billing account=4361 took_ms=541 msg=handled\nseq=0072 level=info module=worker account=4294 took_ms=172 msg=handled\nseq=0073 level=info module=billing account=9798 took_ms=718 msg=handled\nseq=0074 level=info module=worker account=8257 took_ms=820 msg=handled\nseq=0075 level=warn module=worker account=4375 took_ms=569 msg=retry scheduled\nseq=0076 level=info module=billing account=9092 took_ms=797 msg=handled\nseq=0077 level=info module=ingest account=9118 took_ms=53 msg=handled\nseq=0078 level=info module=gateway account=6682 took_ms=818 msg=handled\nseq=0079 level=info module=billing account=6581 took_ms=102 msg=handled\nseq=0080 level=info module=ingest account=2117 took_ms=200 msg=handled\nseq=0081 level=warn module=search account=4005 took_ms=283 msg=retry scheduled\nseq=0082 level=error module=billing account=8915 took_ms=317 msg=upstream timeout\nseq=0083 level=info module=worker account=5837 took_ms=741 msg=handled\nseq=0084 level=info module=gateway account=4217 took_ms=145 msg=handled\nseq=0085 level=info module=billing account=7999 took_ms=135 msg=handled\nseq=0086 level=error module=ingest account=2573 took_ms=394 msg=upstream timeout\nseq=0087 level=info module=ingest account=7619 took_ms=491 msg=handled\nseq=0088 level=info module=ingest account=2881 took_ms=174 msg=handled\nseq=0089 level=warn module=ingest account=4631 took_ms=258 msg=retry scheduled\nseq=0090 level=info module=gateway account=7955 took_ms=641 msg=handled\nseq=0091 level=info module=search account=8947 took_ms=444 msg=handled\nseq=0092 level=info module=billing account=3143 took_ms=503 msg=handled\nseq=0093 level=info module=ingest account=1001 took_ms=497 msg=handled\nseq=0094 level=info module=billing account=5332 took_ms=747 msg=handled\nseq=0095 level=info module=ingest account=5159 took_ms=633 msg=handled\nseq=0096 level=info module=worker account=5520 took_ms=613 msg=handled\nseq=0097 level=info module=ingest account=1227 took_ms=72 msg=handled\nseq=0098 level=info module=ingest account=4902 took_ms=686 msg=handled\nseq=0099 level=warn module=search account=8658 took_ms=6 msg=retry scheduled\nseq=0100 level=info module=ingest account=5151 took_ms=95 msg=handled\nseq=0101 level=info module=worker account=2038 took_ms=415 msg=handled\nseq=0102 level=info module=billing account=4521 took_ms=8 msg=handled\nseq=0103 level=info module=search account=8637 took_ms=777 msg=handled\nseq=0104 level=info module=worker account=6770 took_ms=398 msg=handled\nseq=0105 level=info module=gateway account=5139 took_ms=16 msg=handled\nseq=0106 level=info module=billing account=3004 took_ms=523 msg=handled\nseq=0107 level=info module=worker account=8793 took_ms=897 msg=handled\nseq=0108 level=error module=billing account=5817 took_ms=1 msg=upstream timeout\nseq=0109 level=info module=gateway account=8684 took_ms=486 msg=handled\nseq=0110 level=info module=search account=4875 took_ms=140 msg=handled\nseq=0111 level=info module=billing account=8833 took_ms=387 msg=handled\nseq=0112 level=info module=ingest account=2947 took_ms=251 msg=handled\nseq=0113 level=warn module=ingest account=7128 took_ms=767 msg=retry scheduled\nseq=0114 level=warn module=worker account=4077 took_ms=801 msg=retry scheduled\nseq=0115 level=warn module=gateway account=2947 took_ms=350 msg=retry scheduled\nseq=0116 level=info module=gateway account=7647 took_ms=364 msg=handled\nseq=0117 level=warn module=search account=6649 took_ms=890 msg=retry scheduled\nseq=0118 level=warn module=search account=4493 took_ms=374 msg=retry scheduled\nseq=0119 level=info module=ingest account=7094 took_ms=271 msg=handled\nseq=0120 level=error module=billing account=2427 took_ms=311 msg=upstream timeout\nseq=0121 level=info module=billing account=5953 took_ms=623 msg=handled\nseq=0122 level=warn module=search account=6121 took_ms=89 msg=retry scheduled\nseq=0123 level=info module=ingest account=1106 took_ms=474 msg=handled\nseq=0124 level=info module=billing account=9281 took_ms=633 msg=handled\nseq=0125 level=info module=search account=7056 took_ms=435 msg=handled\nseq=0126 level=error module=worker account=1260 took_ms=659 msg=upstream timeout\nseq=0127 level=warn module=ingest account=2545 took_ms=498 msg=retry scheduled\nseq=0128 level=info module=worker account=9172 took_ms=520 msg=handled\nseq=0129 level=warn module=ingest account=9543 took_ms=433 msg=retry scheduled\nseq=0130 level=info module=worker account=4639 took_ms=824 msg=handled\nseq=0131 level=warn module=worker account=6296 took_ms=576 msg=retry scheduled\nseq=0132 level=info module=gateway account=9689 took_ms=772 msg=handled\nseq=0133 level=info module=billing account=4843 took_ms=313 msg=handled\nseq=0134 level=info module=billing account=4987 took_ms=667 msg=handled\nseq=0135 level=info module=ingest account=3112 took_ms=534 msg=handled\nseq=0136 level=warn module=ingest account=3913 took_ms=580 msg=retry scheduled\nseq=0137 level=info module=worker account=9130 took_ms=679 msg=handled\nseq=0138 level=warn module=search account=3049 took_ms=487 msg=retry scheduled\nseq=0139 level=info module=search account=8409 took_ms=67 msg=handled\nseq=0140 level=info module=ingest account=8222 took_ms=126 msg=handled\n\n[request nonce ce88d9c74c0dc672]"
+        }
+      ],
+      "max_tokens": 85,
+      "temperature": 0.4,
+      "stop": [
+        "\n\n###"
+      ],
+      "stream": true
+    },
+    "r12": {
+      "model": "auto",
+      "max_tokens": 66,
+      "system": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses.",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Here is an audit trail. Name the account whose quota was raised twice, in one sentence.\n\nThe log:\n\nseq=0001 level=info module=search account=2501 took_ms=459 msg=handled\nseq=0002 level=warn module=worker account=6447 took_ms=530 msg=retry scheduled\nseq=0003 level=info module=worker account=1115 took_ms=587 msg=handled\nseq=0004 level=error module=billing account=8509 took_ms=310 msg=upstream timeout\nseq=0005 level=warn module=billing account=1635 took_ms=809 msg=retry scheduled\nseq=0006 level=info module=worker account=6792 took_ms=432 msg=handled\nseq=0007 level=info module=gateway account=8198 took_ms=62 msg=handled\nseq=0008 level=info module=search account=2460 took_ms=630 msg=handled\nseq=0009 level=info module=worker account=3104 took_ms=706 msg=handled\nseq=0010 level=info module=billing account=1616 took_ms=822 msg=handled\nseq=0011 level=warn module=gateway account=8833 took_ms=698 msg=retry scheduled\nseq=0012 level=warn module=worker account=7745 took_ms=24 msg=retry scheduled\nseq=0013 level=info module=search account=8300 took_ms=135 msg=handled\nseq=0014 level=info module=billing account=7580 took_ms=725 msg=handled\nseq=0015 level=info module=billing account=9036 took_ms=265 msg=handled\nseq=0016 level=error module=ingest account=5914 took_ms=480 msg=upstream timeout\nseq=0017 level=info module=worker account=7282 took_ms=52 msg=handled\nseq=0018 level=info module=ingest account=4522 took_ms=413 msg=handled\nseq=0019 level=info module=ingest account=3923 took_ms=546 msg=handled\nseq=0020 level=warn module=ingest account=2029 took_ms=324 msg=retry scheduled\nseq=0021 level=info module=ingest account=3139 took_ms=506 msg=handled\nseq=0022 level=info module=gateway account=3079 took_ms=559 msg=handled\nseq=0023 level=warn module=gateway account=4722 took_ms=8 msg=retry scheduled\nseq=0024 level=info module=billing account=8943 took_ms=586 msg=handled\nseq=0025 level=warn module=gateway account=2931 took_ms=200 msg=retry scheduled\nseq=0026 level=warn module=billing account=3371 took_ms=410 msg=retry scheduled\nseq=0027 level=info module=gateway account=9703 took_ms=173 msg=handled\nseq=0028 level=warn module=ingest account=8906 took_ms=590 msg=retry scheduled\nseq=0029 level=warn module=gateway account=4828 took_ms=22 msg=retry scheduled\nseq=0030 level=info module=ingest account=3834 took_ms=762 msg=handled\nseq=0031 level=info module=search account=5946 took_ms=396 msg=handled\nseq=0032 level=info module=worker account=5425 took_ms=310 msg=handled\nseq=0033 level=error module=ingest account=3312 took_ms=503 msg=upstream timeout\nseq=0034 level=info module=gateway account=4008 took_ms=280 msg=handled\nseq=0035 level=error module=search account=4027 took_ms=59 msg=upstream timeout\nseq=0036 level=error module=worker account=4524 took_ms=712 msg=upstream timeout\nseq=0037 level=info module=billing account=1781 took_ms=741 msg=handled\nseq=0038 level=info module=gateway account=9752 took_ms=233 msg=handled\nseq=0039 level=warn module=gateway account=8236 took_ms=9 msg=retry scheduled\nseq=0040 level=info module=gateway account=4624 took_ms=471 msg=handled\nseq=0041 level=warn module=billing account=9441 took_ms=728 msg=retry scheduled\nseq=0042 level=info module=billing account=8007 took_ms=817 msg=handled\nseq=0043 level=info module=search account=8021 took_ms=807 msg=handled\nseq=0044 level=warn module=gateway account=7484 took_ms=422 msg=retry scheduled\nseq=0045 level=info module=worker account=9268 took_ms=30 msg=handled\nseq=0046 level=info module=search account=9104 took_ms=812 msg=handled\nseq=0047 level=info module=search account=1525 took_ms=804 msg=handled\nseq=0048 level=warn module=gateway account=4867 took_ms=751 msg=retry scheduled\nseq=0049 level=error module=search account=3785 took_ms=307 msg=upstream timeout\nseq=0050 level=error module=gateway account=3791 took_ms=685 msg=upstream timeout\nseq=0051 level=info module=gateway account=6926 took_ms=380 msg=handled\nseq=0052 level=info module=gateway account=6713 took_ms=272 msg=handled\nseq=0053 level=info module=ingest account=9343 took_ms=343 msg=handled\nseq=0054 level=info module=search account=2176 took_ms=253 msg=handled\nseq=0055 level=error module=worker account=7703 took_ms=582 msg=upstream timeout\nseq=0056 level=info module=worker account=3435 took_ms=574 msg=handled\nseq=0057 level=info module=billing account=7432 took_ms=43 msg=handled\nseq=0058 level=warn module=search account=6866 took_ms=724 msg=retry scheduled\nseq=0059 level=info module=search account=6266 took_ms=795 msg=handled\nseq=0060 level=info module=gateway account=3977 took_ms=438 msg=handled\nseq=0061 level=info module=billing account=2014 took_ms=59 msg=handled\nseq=0062 level=info module=gateway account=7522 took_ms=255 msg=handled\nseq=0063 level=info module=search account=7560 took_ms=114 msg=handled\nseq=0064 level=error module=search account=5808 took_ms=360 msg=upstream timeout\nseq=0065 level=info module=worker account=7305 took_ms=776 msg=handled\nseq=0066 level=info module=search account=9328 took_ms=51 msg=handled\nseq=0067 level=info module=ingest account=4118 took_ms=98 msg=handled\nseq=0068 level=warn module=worker account=1837 took_ms=24 msg=retry scheduled\nseq=0069 level=info module=worker account=5056 took_ms=343 msg=handled\nseq=0070 level=info module=ingest account=5020 took_ms=589 msg=handled\nseq=0071 level=info module=ingest account=4992 took_ms=166 msg=handled\nseq=0072 level=info module=ingest account=6787 took_ms=601 msg=handled\nseq=0073 level=info module=billing account=7612 took_ms=125 msg=handled\nseq=0074 level=info module=gateway account=7393 took_ms=806 msg=handled\nseq=0075 level=info module=billing account=3251 took_ms=124 msg=handled\nseq=0076 level=warn module=gateway account=3729 took_ms=270 msg=retry scheduled\nseq=0077 level=error module=gateway account=7490 took_ms=770 msg=upstream timeout\nseq=0078 level=warn module=search account=1190 took_ms=119 msg=retry scheduled\nseq=0079 level=info module=search account=8969 took_ms=852 msg=handled\nseq=0080 level=info module=billing account=8541 took_ms=869 msg=handled\nseq=0081 level=info module=worker account=5602 took_ms=787 msg=handled\nseq=0082 level=warn module=billing account=5602 took_ms=61 msg=retry scheduled\nseq=0083 level=error module=billing account=9839 took_ms=323 msg=upstream timeout\nseq=0084 level=info module=search account=7676 took_ms=233 msg=handled\nseq=0085 level=error module=search account=7531 took_ms=827 msg=upstream timeout\nseq=0086 level=warn module=ingest account=2995 took_ms=757 msg=retry scheduled\nseq=0087 level=error module=worker account=2786 took_ms=407 msg=upstream timeout\nseq=0088 level=warn module=ingest account=5510 took_ms=573 msg=retry scheduled\nseq=0089 level=warn module=search account=8349 took_ms=122 msg=retry scheduled\nseq=0090 level=info module=ingest account=2701 took_ms=297 msg=handled\nseq=0091 level=warn module=worker account=4142 took_ms=369 msg=retry scheduled\nseq=0092 level=info module=gateway account=8918 took_ms=497 msg=handled\nseq=0093 level=error module=gateway account=2304 took_ms=99 msg=upstream timeout\nseq=0094 level=error module=ingest account=4335 took_ms=184 msg=upstream timeout\nseq=0095 level=error module=gateway account=2636 took_ms=288 msg=upstream timeout\nseq=0096 level=error module=worker account=2983 took_ms=389 msg=upstream timeout\nseq=0097 level=info module=billing account=3386 took_ms=358 msg=handled\nseq=0098 level=info module=billing account=4881 took_ms=345 msg=handled\nseq=0099 level=info module=worker account=9901 took_ms=233 msg=handled\nseq=0100 level=warn module=search account=1618 took_ms=415 msg=retry scheduled\nseq=0101 level=info module=worker account=5146 took_ms=367 msg=handled\nseq=0102 level=error module=ingest account=5071 took_ms=242 msg=upstream timeout\nseq=0103 level=info module=gateway account=3397 took_ms=541 msg=handled\nseq=0104 level=info module=gateway account=5844 took_ms=683 msg=handled\nseq=0105 level=info module=ingest account=1919 took_ms=683 msg=handled\nseq=0106 level=info module=billing account=5603 took_ms=883 msg=handled\nseq=0107 level=error module=search account=9303 took_ms=775 msg=upstream timeout\nseq=0108 level=info module=ingest account=5168 took_ms=704 msg=handled\nseq=0109 level=error module=ingest account=6881 took_ms=287 msg=upstream timeout\nseq=0110 level=info module=billing account=9192 took_ms=596 msg=handled\nseq=0111 level=error module=ingest account=4824 took_ms=820 msg=upstream timeout\nseq=0112 level=error module=ingest account=4450 took_ms=406 msg=upstream timeout\nseq=0113 level=info module=worker account=8280 took_ms=782 msg=handled\nseq=0114 level=warn module=billing account=8939 took_ms=873 msg=retry scheduled\nseq=0115 level=info module=gateway account=4233 took_ms=259 msg=handled\nseq=0116 level=info module=search account=7138 took_ms=594 msg=handled\nseq=0117 level=info module=ingest account=7652 took_ms=186 msg=handled\nseq=0118 level=info module=ingest account=3142 took_ms=645 msg=handled\nseq=0119 level=warn module=gateway account=9568 took_ms=712 msg=retry scheduled\nseq=0120 level=error module=gateway account=8630 took_ms=882 msg=upstream timeout\nseq=0121 level=warn module=billing account=6338 took_ms=293 msg=retry scheduled\nseq=0122 level=error module=gateway account=1786 took_ms=151 msg=upstream timeout\nseq=0123 level=warn module=gateway account=6586 took_ms=430 msg=retry scheduled\nseq=0124 level=info module=search account=5933 took_ms=333 msg=handled\nseq=0125 level=warn module=billing account=7362 took_ms=375 msg=retry scheduled\nseq=0126 level=info module=ingest account=9844 took_ms=747 msg=handled\nseq=0127 level=warn module=gateway account=4257 took_ms=708 msg=retry scheduled\nseq=0128 level=info module=search account=9966 took_ms=67 msg=handled\nseq=0129 level=info module=ingest account=7336 took_ms=319 msg=handled\nseq=0130 level=info module=search account=1395 took_ms=891 msg=handled\nseq=0131 level=info module=ingest account=6658 took_ms=880 msg=handled\nseq=0132 level=info module=billing account=9217 took_ms=408 msg=handled\nseq=0133 level=info module=search account=6677 took_ms=269 msg=handled\nseq=0134 level=warn module=worker account=8358 took_ms=85 msg=retry scheduled\nseq=0135 level=info module=gateway account=5889 took_ms=148 msg=handled\nseq=0136 level=info module=search account=8016 took_ms=224 msg=handled\nseq=0137 level=error module=billing account=5269 took_ms=27 msg=upstream timeout\nseq=0138 level=info module=worker account=7119 took_ms=42 msg=handled\nseq=0139 level=warn module=search account=3183 took_ms=818 msg=retry scheduled\nseq=0140 level=error module=billing account=1789 took_ms=864 msg=upstream timeout\n\n[request nonce 190fd400b310343b]"
+        }
+      ],
+      "temperature": 0.68
+    },
+    "r13": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Write a one-paragraph release note for the version described below, addressed to customers.\n\nThe text: Version 4.2 of the console now keeps filters when you switch pages, shows the deploy history beside each environment, and no longer logs the user out after an idle hour.\n\n[request nonce b573a1b61899317d]"
+        }
+      ],
+      "max_tokens": 512,
+      "temperature": 0.04
+    },
+    "r14": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses."
+        },
+        {
+          "role": "user",
+          "content": "Summarise the three bullet points below as one sentence for the status page.\n\nThe text: The queue drained by noon. Two workers restarted after their memory limit was raised. The error rate is back under its alert threshold.\n\n[request nonce de6fc8d3de65c577]"
+        }
+      ],
+      "max_tokens": 166,
+      "temperature": 0.41,
+      "stop": [
+        "\n\n###"
+      ]
+    },
+    "r15": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Rewrite the paragraph below in plain English at a sixth-grade reading level.\n\nThe text: The migration, which had been scheduled for the maintenance window, was postponed because the replica, having fallen behind during the previous night, had not yet caught up with the primary.\n\n[request nonce 85c7ad18db4bb244]"
+        }
+      ],
+      "max_tokens": 413,
+      "temperature": 0.3
+    },
+    "r16": {
+      "model": "auto",
+      "max_tokens": 224,
+      "system": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses.",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Name the two risks the paragraph below implies, as a short numbered list.\n\nThe text: The new pricing depends on one vendor quota that has been raised twice this quarter, and the export pipeline has no test that runs on the real invoice shapes.\n\n[request nonce 2a4f2871b4ede1db]"
+        }
+      ],
+      "temperature": 0.61
+    },
+    "r17": {
+      "model": "auto",
+      "max_tokens": 471,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Answer the question in the text below in at most two sentences.\n\nThe text: Question: how long does a trial last, and what happens to its data when it ends?\n\n[request nonce 1a2d24721fd4334e]"
+        }
+      ],
+      "temperature": 0.22,
+      "stop_sequences": [
+        "\n\nHuman:"
+      ],
+      "stream": true
+    },
+    "r18": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses."
+        },
+        {
+          "role": "user",
+          "content": "Turn the notes below into a short checklist of the steps they describe.\n\nThe text: Notes: run the migration, then restart the workers, then check the queue depth, then announce the change in the channel.\n\n[request nonce 6a3a854187a143dc]"
+        }
+      ],
+      "max_tokens": 418,
+      "temperature": 0.77,
+      "stream": true
+    },
+    "r19": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give one concrete example that makes the definition below easier to understand.\n\nThe text: Definition: a quota is the number of calls a provider will answer in a window before it starts refusing.\n\n[request nonce bf05306285697598]"
+        }
+      ],
+      "max_tokens": 394,
+      "temperature": 0.3
+    },
+    "r20": {
+      "model": "auto",
+      "max_tokens": 455,
+      "system": "You are a careful operations assistant. Follow the tool contract exactly, never invent an account id, and answer in the language the request uses.",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Restate the claim below as a testable hypothesis, in one sentence.\n\nThe text: Claim: a router that retries the same provider twice answers more requests than one that fails over at once.\n\n[request nonce e400562afe0bfaac]"
+        }
+      ],
+      "temperature": 0.4,
+      "stream": true
+    }
+  }
+}
